@@ -1,5 +1,21 @@
 import {StatusBar} from 'expo-status-bar';
 import {StyleSheet, Text, View} from 'react-native';
+import Onyx from 'react-native-onyx';
+
+// #region Onyx config
+const ONYXKEYS = {
+    SESSION: 'session',
+};
+
+const config = {
+    keys: ONYXKEYS,
+};
+
+console.log('Onyx.init …');
+Onyx.init(config);
+console.log('Onyx.init done');
+
+// #endregion
 
 const styles = StyleSheet.create({
     container: {
