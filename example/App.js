@@ -1,6 +1,6 @@
 import {StatusBar} from 'expo-status-bar';
 import {StyleSheet, Text, View} from 'react-native';
-import Onyx from 'react-native-onyx';
+import Onyx, {withOnyx} from 'react-native-onyx';
 
 // #region Onyx config
 const ONYXKEYS = {
@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
     },
 });
 
-export default function App() {
+function App() {
     return (
         <View style={styles.container}>
             <Text>Open up App.js to start working on your app!</Text>
@@ -32,3 +32,9 @@ export default function App() {
         </View>
     );
 }
+
+export default withOnyx({
+    session: {
+        key: ONYXKEYS.SESSION,
+    },
+})(App);
