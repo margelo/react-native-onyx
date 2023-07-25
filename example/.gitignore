@@ -21,6 +21,7 @@ DerivedData
 *.ipa
 *.xcuserstate
 ios/.xcode.env.local
+ios/example.xcworkspace/xcshareddata
 
 # Android/IntelliJ
 #
