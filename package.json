@@ -31,6 +31,7 @@
   "react-native": "native.js",
   "main": "native.js",
   "browser": "web.js",
+  "source": "lib",
   "scripts": {
     "lint": "eslint .",
     "lint-tests": "eslint tests/**",

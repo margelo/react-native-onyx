@@ -11,9 +11,7 @@ const config = {
     keys: ONYXKEYS,
 };
 
-console.log('Onyx.init …');
 Onyx.init(config);
-console.log('Onyx.init done');
 
 // #endregion
 
