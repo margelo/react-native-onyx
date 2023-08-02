@@ -70,6 +70,8 @@ function App() {
     };
 
     const handleClick = async () => {
+        setLogs([]);
+
         const operation = getValue('operation');
         const itemCount = getValue('items');
         const database = getValue('database');
