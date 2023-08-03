@@ -109,13 +109,11 @@ function App() {
         });
 
         // Always clear onyx before running tests
-        // if (operation === 'Clear') {
-        addLog('Clearing Onyx...');
-        await Onyx.clear();
-        addLog('Cleared Onyx');
-
-        // return;
-        // }
+        if (operation !== 'Clear') {
+            addLog('Clearing Onyx...');
+            await Onyx.clear();
+            addLog('Cleared Onyx');
+        }
 
         // Generate fake data with faker
         addLog(`Generating ${itemCount} fake data items with length "${length}" and depth "${depth}"`);
