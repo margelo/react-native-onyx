@@ -41,6 +41,7 @@
   "dependencies": {
     "ascii-table": "0.0.9",
     "fast-equals": "^4.0.3",
+    "idb-keyval": "^6.2.1",
     "underscore": "^1.13.1"
   },
   "devDependencies": {

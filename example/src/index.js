@@ -55,7 +55,7 @@ function generateFakeDataAsync(count) {
         setTimeout(() => {
             const fakeData = {};
             for (let i = 0; i < Number(count); i++) {
-                fakeData[`${ONYXKEYS.COLLECTION.SAMPLE}${i}`] = generateRandomObject(35, 1);
+                fakeData[`${ONYXKEYS.COLLECTION.SAMPLE}${i}`] = generateRandomObject(10, 3);
             }
             resolve(fakeData);
         }, 0);
