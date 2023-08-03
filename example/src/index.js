@@ -6,8 +6,13 @@ import React from 'react';
 import {createRoot} from 'react-dom/client';
 import {faker} from '@faker-js/faker';
 import Onyx from '../../lib/index';
+import makeWebStorage from '../../lib/storage/WebStorage';
+import IDBKeyValStorageProvider from '../../lib/storage/providers/IDBKeyVal';
+import LocalforageStorageProvider from '../../lib/storage/providers/LocalForage';
 
-function Option({label, category, value}) {
+function Option({
+    label, category, value, defaultSelected = false,
+}) {
     return (
         <div style={{
             display: 'flex',
@@ -15,7 +20,7 @@ function Option({label, category, value}) {
             columnGap: '1rem',
         }}
         >
-            <input type="radio" name={category} id={label} value={value || label} />
+            <input type="radio" name={category} id={label} value={value || label} defaultChecked={defaultSelected} />
             <label htmlFor={label}>{label}</label>
         </div>
     );
@@ -41,15 +46,20 @@ const config = {
     keys: ONYXKEYS,
 };
 
+function makeRandomWord() {
+    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    return possible.charAt(Math.floor(Math.random() * possible.length));
+}
+
 function generateRandomObject(numProperties, depth) {
     if (depth <= 0) {
-        return faker.word.words(); // Return a random value (e.g., word, sentence, etc.) from Faker.js
+        return makeRandomWord(); // Return a random value (e.g., word, sentence, etc.) from Faker.js
     }
 
     const obj = {};
 
     for (let i = 0; i < numProperties; i++) {
-        const propName = faker.word.noun();
+        const propName = makeRandomWord();
         const propValue = generateRandomObject(numProperties, depth - 1);
         obj[propName] = propValue;
     }
@@ -85,15 +95,27 @@ function App() {
         const depth = getNumberInputValueBy('depth');
         const database = getValue('database');
 
-        // Setup onyx
-        Onyx.init(config);
-
-        if (operation === 'Clear') {
-            addLog('Clearing Onyx...');
-            await Onyx.clear();
-            addLog('Cleared Onyx');
-            return;
+        let storageProvider;
+        if (database === 'idb-keyval/IndexedDB') {
+            storageProvider = makeWebStorage(IDBKeyValStorageProvider);
+        } else if (database === 'Localforage/IndexedDB (Default)') {
+            storageProvider = makeWebStorage(LocalforageStorageProvider);
         }
+
+        // Setup onyx
+        Onyx.init({
+            ...config,
+            storageProvider,
+        });
+
+        // Always clear onyx before running tests
+        // if (operation === 'Clear') {
+        addLog('Clearing Onyx...');
+        await Onyx.clear();
+        addLog('Cleared Onyx');
+
+        // return;
+        // }
 
         // Generate fake data with faker
         addLog(`Generating ${itemCount} fake data items with length "${length}" and depth "${depth}"`);
@@ -113,10 +135,10 @@ function App() {
         if (operation === 'MergeCollection') {
             await Onyx.mergeCollection(ONYXKEYS.COLLECTION.SAMPLE, fakeData);
         }
-        if (operation === 'Merge') {
+        if (operation === 'Single Merge') {
             await Onyx.merge(ONYXKEYS.SAMPLE, fakeData);
         }
-        if (operation === 'Set') {
+        if (operation === 'Single Set') {
             await Onyx.set(ONYXKEYS.SAMPLE, fakeData);
         }
         if (operation === 'Get (collection)') {
@@ -145,15 +167,15 @@ function App() {
             >
                 <div>
                     <b>Operation</b>
-                    <Option label="Set" category="operation" />
+                    <Option label="Single Set" category="operation" defaultSelected />
                     <Option label="Get (collection)" category="operation" />
                     <Option label="MergeCollection" category="operation" />
-                    <Option label="Merge" category="operation" />
+                    <Option label="Single Merge" category="operation" />
                     <Option label="Clear" category="operation" />
                 </div>
                 <div>
                     <b>Items</b>
-                    <Option label="100" category="items" value={100} />
+                    <Option label="100" category="items" value={100} defaultSelected />
                     <Option label="1,000" category="items" value={1000} />
                     <Option label="10,000" category="items" value={10000} />
                     <Option label="100,000" category="items" value={100000} />
@@ -180,7 +202,7 @@ function App() {
                 </div>
                 <div>
                     <b>Database</b>
-                    <Option label="Localforage/IndexedDB (Default)" category="database" />
+                    <Option label="Localforage/IndexedDB (Default)" category="database" defaultSelected />
                     <Option label="WebSQL" category="database" />
                     <Option label="idb-keyval/IndexedDB" category="database" />
                 </div>
