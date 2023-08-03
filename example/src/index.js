@@ -1,3 +1,4 @@
+/* eslint-disable rulesdir/prefer-onyx-connect-in-libs */
 /* eslint-disable rulesdir/prefer-underscore-method */
 /* eslint-disable rulesdir/prefer-actions-set-data */
 /* eslint-disable @lwc/lwc/no-async-await */
@@ -25,10 +26,16 @@ const getValue = (category) => {
     return selectedOption ? selectedOption.value : null;
 };
 
+const getNumberInputValueBy = (id) => {
+    const input = document.getElementById(id);
+    return input ? Number(input.value) : null;
+};
+
 const ONYXKEYS = {
     COLLECTION: {
         SAMPLE: 'collection_',
     },
+    SAMPLE: 'sample',
 };
 const config = {
     keys: ONYXKEYS,
@@ -50,12 +57,12 @@ function generateRandomObject(numProperties, depth) {
     return obj;
 }
 
-function generateFakeDataAsync(count) {
+function generateFakeDataAsync(count, length, depth) {
     return new Promise((resolve) => {
         setTimeout(() => {
             const fakeData = {};
             for (let i = 0; i < Number(count); i++) {
-                fakeData[`${ONYXKEYS.COLLECTION.SAMPLE}${i}`] = generateRandomObject(10, 3);
+                fakeData[`${ONYXKEYS.COLLECTION.SAMPLE}${i}`] = generateRandomObject(length, depth);
             }
             resolve(fakeData);
         }, 0);
@@ -74,25 +81,58 @@ function App() {
 
         const operation = getValue('operation');
         const itemCount = getValue('items');
+        const length = getNumberInputValueBy('length');
+        const depth = getNumberInputValueBy('depth');
         const database = getValue('database');
 
         // Setup onyx
         Onyx.init(config);
 
+        if (operation === 'Clear') {
+            addLog('Clearing Onyx...');
+            await Onyx.clear();
+            addLog('Cleared Onyx');
+            return;
+        }
+
         // Generate fake data with faker
-        addLog(`Generating ${itemCount} fake data items...`);
-        const fakeData = await generateFakeDataAsync(itemCount);
+        addLog(`Generating ${itemCount} fake data items with length "${length}" and depth "${depth}"`);
+        const fakeData = await generateFakeDataAsync(itemCount, length, depth);
         const bytes = JSON.stringify(fakeData).length;
         const megabytes = bytes / 1000000;
         addLog(`Generated ${itemCount} fake data items of size ${megabytes}MB`);
 
+        if (operation === 'Get (collection)') {
+            addLog('Inserting items into onyx for getting later');
+            await Onyx.mergeCollection(ONYXKEYS.COLLECTION.SAMPLE, fakeData);
+        }
+
         // Insert N items into onyx, while measuring time
-        addLog(`Inserting ${itemCount} items into Onyx...`);
+        addLog(`${operation} ${itemCount} items from/into Onyx...`);
         const start = performance.now();
-        await Onyx.mergeCollection(ONYXKEYS.COLLECTION.SAMPLE, fakeData);
+        if (operation === 'MergeCollection') {
+            await Onyx.mergeCollection(ONYXKEYS.COLLECTION.SAMPLE, fakeData);
+        }
+        if (operation === 'Merge') {
+            await Onyx.merge(ONYXKEYS.SAMPLE, fakeData);
+        }
+        if (operation === 'Set') {
+            await Onyx.set(ONYXKEYS.SAMPLE, fakeData);
+        }
+        if (operation === 'Get (collection)') {
+            await new Promise((resolve) => {
+                Onyx.connect({
+                    key: ONYXKEYS.COLLECTION.SAMPLE,
+                    waitForCollectionCallback: true,
+                    callback: () => {
+                        resolve();
+                    },
+                });
+            });
+        }
         const end = performance.now();
 
-        addLog(`Inserted ${itemCount} items into Onyx in ${end - start}ms`);
+        addLog(`${operation} ${itemCount} items into Onyx in ${end - start}ms`);
     };
 
     return (
@@ -106,8 +146,10 @@ function App() {
                 <div>
                     <b>Operation</b>
                     <Option label="Set" category="operation" />
-                    <Option label="Get" category="operation" />
+                    <Option label="Get (collection)" category="operation" />
+                    <Option label="MergeCollection" category="operation" />
                     <Option label="Merge" category="operation" />
+                    <Option label="Clear" category="operation" />
                 </div>
                 <div>
                     <b>Items</b>
@@ -115,6 +157,26 @@ function App() {
                     <Option label="1,000" category="items" value={1000} />
                     <Option label="10,000" category="items" value={10000} />
                     <Option label="100,000" category="items" value={100000} />
+                </div>
+                <div>
+                    <b>Length</b>
+                    <input
+                        id="length"
+                        type="number"
+                        value={35}
+                        style={{
+                            display: 'block',
+                        }}
+                    />
+                    <b>Depth</b>
+                    <input
+                        id="depth"
+                        type="number"
+                        value={1}
+                        style={{
+                            display: 'block',
+                        }}
+                    />
                 </div>
                 <div>
                     <b>Database</b>
