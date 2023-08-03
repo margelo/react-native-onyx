@@ -103,7 +103,7 @@ function App() {
         }
 
         // Setup onyx
-        Onyx.init({
+        await Onyx.init({
             ...config,
             storageProvider,
         });
