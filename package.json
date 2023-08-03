@@ -74,6 +74,7 @@
     "webpack-merge": "^5.8.0"
   },
   "peerDependencies": {
+    "idb-keyval": "^6.2.1",
     "localforage": "^1.10.0",
     "localforage-removeitems": "^1.4.0",
     "react": ">=18.1.0",
