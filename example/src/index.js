@@ -163,7 +163,7 @@ function App() {
                     <input
                         id="length"
                         type="number"
-                        value={35}
+                        defaultValue={35}
                         style={{
                             display: 'block',
                         }}
@@ -172,7 +172,7 @@ function App() {
                     <input
                         id="depth"
                         type="number"
-                        value={1}
+                        defaultValue={1}
                         style={{
                             display: 'block',
                         }}
