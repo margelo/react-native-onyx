@@ -42,6 +42,8 @@
     "ascii-table": "0.0.9",
     "fast-equals": "^4.0.3",
     "idb-keyval": "^6.2.1",
+    "localforage": "^1.10.0",
+    "localforage-removeitems": "^1.4.0",
     "underscore": "^1.13.1"
   },
   "devDependencies": {

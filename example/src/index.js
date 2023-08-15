@@ -4,11 +4,10 @@
 /* eslint-disable @lwc/lwc/no-async-await */
 import React from 'react';
 import {createRoot} from 'react-dom/client';
-import {faker} from '@faker-js/faker';
 import Onyx from '../../lib/index';
 import makeWebStorage from '../../lib/storage/WebStorage';
 import IDBKeyValStorageProvider from '../../lib/storage/providers/IDBKeyVal';
-import LocalforageStorageProvider from '../../lib/storage/providers/LocalForage';
+import LocalforageStorageProvider from '../../lib/storage/providers/OldLocalForage';
 
 function Option({
     label, category, value, defaultSelected = false,
@@ -127,6 +126,11 @@ function App() {
             await Onyx.mergeCollection(ONYXKEYS.COLLECTION.SAMPLE, fakeData);
         }
 
+        if (operation === 'Clear') {
+            addLog('Inserting items into onyx for clearing later');
+            await Onyx.mergeCollection(ONYXKEYS.COLLECTION.SAMPLE, fakeData);
+        }
+
         // Insert N items into onyx, while measuring time
         addLog(`${operation} ${itemCount} items from/into Onyx...`);
         const start = performance.now();
@@ -149,6 +153,9 @@ function App() {
                     },
                 });
             });
+        }
+        if (operation === 'Clear') {
+            await Onyx.clear();
         }
         const end = performance.now();
 
