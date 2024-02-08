@@ -93,7 +93,7 @@ function App() {
         const length = getNumberInputValueBy('length');
         const depth = getNumberInputValueBy('depth');
         const database = getValue('database');
-
+        console.log({database, operation});
         let storageProvider;
         if (database === 'idb-keyval/IndexedDB') {
             storageProvider = makeWebStorage(IDBKeyValStorageProvider);
