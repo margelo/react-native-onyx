@@ -8,6 +8,8 @@ import Onyx from '../../lib/index';
 import makeWebStorage from '../../lib/storage/WebStorage';
 import IDBKeyValStorageProvider from '../../lib/storage/providers/IDBKeyVal';
 import LocalforageStorageProvider from '../../lib/storage/providers/OldLocalForage';
+import SQLiteWASMStorage from '../../lib/storage/providers/SQLiteWASMStorage';
+import NoStorage from '../../lib/storage/providers/NoStorage';
 
 function Option({
     label, category, value, defaultSelected = false,
@@ -93,12 +95,16 @@ function App() {
         const length = getNumberInputValueBy('length');
         const depth = getNumberInputValueBy('depth');
         const database = getValue('database');
-        console.log({database, operation});
+
         let storageProvider;
         if (database === 'idb-keyval/IndexedDB') {
             storageProvider = makeWebStorage(IDBKeyValStorageProvider);
         } else if (database === 'Localforage/IndexedDB (Default)') {
             storageProvider = makeWebStorage(LocalforageStorageProvider);
+        } else if (database === 'SQLiteWASM') {
+            storageProvider = makeWebStorage(SQLiteWASMStorage);
+        } else if (database === 'NoStorage') {
+            storageProvider = makeWebStorage(NoStorage);
         }
 
         // Setup onyx
@@ -209,7 +215,9 @@ function App() {
                     <b>Database</b>
                     <Option label="Localforage/IndexedDB (Default)" category="database" defaultSelected />
                     <Option label="WebSQL" category="database" />
-                    <Option label="idb-keyval/IndexedDB" category="database" />
+                    <Option label="idb-keyval/IndexedDB" category="database" defaultSelected />
+                    <Option label="SQLiteWASM" category="database" />
+                    <Option label="NoStorage" category="database" />
                 </div>
             </div>
             <button onClick={handleClick} type="button">Get Selected Options</button>
