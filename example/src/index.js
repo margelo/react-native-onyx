@@ -8,7 +8,8 @@ import Onyx from '../../lib/index';
 import makeWebStorage from '../../lib/storage/WebStorage';
 import IDBKeyValStorageProvider from '../../lib/storage/providers/IDBKeyVal';
 import LocalforageStorageProvider from '../../lib/storage/providers/OldLocalForage';
-import SQLiteWASMStorage from '../../lib/storage/providers/SQLiteWASMStorage';
+import SQLiteWASMStorageMainThread from '../../lib/storage/providers/SQLiteWASMStorageMainThread';
+import SQLiteWASMStorageWorker from '../../lib/storage/providers/SQLiteWASMStorageWorker';
 import NoStorage from '../../lib/storage/providers/NoStorage';
 
 function Option({
@@ -101,8 +102,10 @@ function App() {
             storageProvider = makeWebStorage(IDBKeyValStorageProvider);
         } else if (database === 'Localforage/IndexedDB (Default)') {
             storageProvider = makeWebStorage(LocalforageStorageProvider);
-        } else if (database === 'SQLiteWASM') {
-            storageProvider = makeWebStorage(SQLiteWASMStorage);
+        } else if (database === 'SQLiteWASM (main thread)') {
+            storageProvider = makeWebStorage(SQLiteWASMStorageMainThread);
+        } else if (database === 'SQLiteWASM (worker)') {
+            storageProvider = makeWebStorage(SQLiteWASMStorageWorker);
         } else if (database === 'NoStorage') {
             storageProvider = makeWebStorage(NoStorage);
         }
@@ -216,7 +219,8 @@ function App() {
                     <Option label="Localforage/IndexedDB (Default)" category="database" defaultSelected />
                     <Option label="WebSQL" category="database" />
                     <Option label="idb-keyval/IndexedDB" category="database" defaultSelected />
-                    <Option label="SQLiteWASM" category="database" />
+                    <Option label="SQLiteWASM (main thread)" category="database" />
+                    <Option label="SQLiteWASM (worker)" category="database" />
                     <Option label="NoStorage" category="database" />
                 </div>
             </div>
