@@ -11,3 +11,7 @@
 |Merge collection|365.7                  |619.8        |61338.8    |542.7        |600.8          |
 |Single merge    |114.7                  |185.6        |192        |192.4        |311.2          |
 |Clear           |99.08                  |982.7        |681        |166.4        |612            |
+
+> Why "single set" and "Single merge" is slower in "SQLite (worker)"?
+>
+> Because we are passing a large JS object into `postMessage` and serialization steals CPU time
