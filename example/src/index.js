@@ -217,7 +217,6 @@ function App() {
                 <div>
                     <b>Database</b>
                     <Option label="Localforage/IndexedDB (Default)" category="database" defaultSelected />
-                    <Option label="WebSQL" category="database" />
                     <Option label="idb-keyval/IndexedDB" category="database" defaultSelected />
                     <Option label="SQLiteWASM (main thread)" category="database" />
                     <Option label="SQLiteWASM (worker)" category="database" />
