@@ -5,9 +5,8 @@
 import type {BatchQueryResult, QuickSQLiteConnection} from 'react-native-quick-sqlite';
 import {open} from 'react-native-quick-sqlite';
 import {getFreeDiskStorage} from 'react-native-device-info';
-import type StorageProvider from './types';
 import utils from '../../utils';
-import type {KeyList, KeyValuePairList} from './types';
+import type {StorageProvider, KeyList, KeyValuePairList} from './types';
 
 const DB_NAME = 'OnyxDB';
 let db: QuickSQLiteConnection;

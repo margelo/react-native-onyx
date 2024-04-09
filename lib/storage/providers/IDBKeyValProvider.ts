@@ -1,7 +1,7 @@
 import type {UseStore} from 'idb-keyval';
 import {set, keys, getMany, setMany, get, clear, del, delMany, createStore, promisifyRequest} from 'idb-keyval';
 import utils from '../../utils';
-import type StorageProvider from './types';
+import type {StorageProvider} from './types';
 import type {OnyxKey, OnyxValue} from '../../types';
 
 // We don't want to initialize the store while the JS bundle loads as idb-keyval will try to use global.indexedDB
@@ -71,3 +71,5 @@ const provider: StorageProvider = {
 };
 
 export default provider;
+
+export {idbKeyValStore};
