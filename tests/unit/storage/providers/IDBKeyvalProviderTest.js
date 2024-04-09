@@ -1,6 +1,6 @@
 import _ from 'underscore';
 
-import IDBKeyValProviderMock from '../../../../lib/storage/providers/IDBKeyValProvider';
+import IDBKeyValProviderMock from '../../../../lib/storage/providers/__mocks__/IDBKeyValProvider';
 import createDeferredTask from '../../../../lib/createDeferredTask';
 import waitForPromisesToResolve from '../../../utils/waitForPromisesToResolve';
 
@@ -29,7 +29,7 @@ describe('storage/providers/IDBKeyVal', () => {
         // When they are saved
         return IDBKeyValProviderMock.multiSet(pairs).then(() => {
             // We expect a call to idbKeyval.setItem for each pair
-            _.each(pairs, ([key, value]) => expect(IDBKeyValProviderMock.setItem).toHaveBeenCalledWith(key, value));
+            _.each(pairs, ([key, value]) => expect(IDBKeyValProviderMock.idbKeyvalSet).toHaveBeenCalledWith(key, value));
         });
     });
 
@@ -83,7 +83,7 @@ describe('storage/providers/IDBKeyVal', () => {
                 ['@USER_2', USER_2_DELTA],
             ]).then(() => {
                 // Then each existing item should be set with the merged content
-                expect(IDBKeyValProviderMock.setItem).toHaveBeenNthCalledWith(1, '@USER_1', {
+                expect(IDBKeyValProviderMock.idbKeyvalSet).toHaveBeenNthCalledWith(1, '@USER_1', {
                     name: 'Tom',
                     age: 31,
                     traits: {
@@ -92,7 +92,7 @@ describe('storage/providers/IDBKeyVal', () => {
                     },
                 });
 
-                expect(IDBKeyValProviderMock.setItem).toHaveBeenNthCalledWith(2, '@USER_2', {
+                expect(IDBKeyValProviderMock.idbKeyvalSet).toHaveBeenNthCalledWith(2, '@USER_2', {
                     name: 'Sarah',
                     age: 26,
                     traits: {
