@@ -28,8 +28,7 @@ describe('storage/providers/IDBKeyVal', () => {
 
         // When they are saved
         return IDBKeyValProviderMock.multiSet(pairs).then(() => {
-            // We expect a call to idbKeyval.setItem for each pair
-            _.each(pairs, ([key, value]) => expect(IDBKeyValProviderMock.idbKeyvalSet).toHaveBeenCalledWith(key, value));
+            expect(IDBKeyValProviderMock.idbKeyval.setMany).toHaveBeenCalledTimes(1);
         });
     });
 
