@@ -79,5 +79,24 @@ type StorageProvider = {
     keepInstancesSync?: (onStorageKeyChanged: OnStorageKeyChanged) => void;
 };
 
-export default StorageProvider;
-export type {KeyList, KeyValuePair, KeyValuePairList, OnStorageKeyChanged};
+type MethodsOnly<T, Excluded extends keyof T = never> = Pick<
+    T,
+    {
+        // eslint-disable-next-line @typescript-eslint/ban-types
+        [K in keyof T]: T[K] extends Function ? K : never;
+    }[keyof T] &
+        Exclude<keyof T, Excluded>
+>;
+
+interface MockStorageProviderGenerics {
+    getItem: jest.Mock<Promise<OnyxValue<OnyxKey> | null>, [OnyxKey]>;
+    setItem: jest.Mock<Promise<QueryResult | void>, [OnyxKey, OnyxValue<OnyxKey>]>;
+}
+
+type MockStorageProviderMethods = {
+    [K in keyof MethodsOnly<StorageProvider, 'getItem' | 'setItem'>]: jest.Mock<ReturnType<StorageProvider[K]>, Parameters<StorageProvider[K]>>;
+};
+
+type MockStorageProvider = MockStorageProviderGenerics & MockStorageProviderMethods;
+
+export type {StorageProvider, KeyList, KeyValuePair, KeyValuePairList, OnStorageKeyChanged, MockStorageProvider};

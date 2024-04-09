@@ -1,4 +1,4 @@
-import type StorageProvider from './types';
+import type {StorageProvider} from './types';
 
 const provider: StorageProvider = {
     /**

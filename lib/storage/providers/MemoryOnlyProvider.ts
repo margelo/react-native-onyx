@@ -1,7 +1,6 @@
 import _ from 'underscore';
 import utils from '../../utils';
-import type StorageProvider from './types';
-import type {KeyValuePair} from './types';
+import type {KeyValuePair, StorageProvider} from './types';
 import type {OnyxKey, OnyxValue} from '../../types';
 
 type Store = Record<OnyxKey, OnyxValue<OnyxKey>>;
