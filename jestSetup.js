@@ -1,5 +1,5 @@
 jest.mock('./lib/storage');
-jest.mock('./lib/storage/providers');
+jest.mock('./lib/storage/providers/IDBKeyValProvider', () => require('./lib/storage/providers/__mocks__/IDBKeyValProvider'));
 jest.mock('./lib/storage/platforms/index.native', () => require('./lib/storage/__mocks__'));
 jest.mock('idb-keyval', () => require('./node_modules/idb-keyval/dist/mock'));
 

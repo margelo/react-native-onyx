@@ -97,6 +97,9 @@ type MockStorageProviderMethods = {
     [K in keyof MethodsOnly<StorageProvider, 'getItem' | 'setItem'>]: jest.Mock<ReturnType<StorageProvider[K]>, Parameters<StorageProvider[K]>>;
 };
 
-type MockStorageProvider = MockStorageProviderGenerics & MockStorageProviderMethods;
+type MockStorageProvider<AdditionalProps = Record<string, unknown>> = MockStorageProviderGenerics &
+    MockStorageProviderMethods & {
+        name: string;
+    } & AdditionalProps;
 
 export type {StorageProvider, KeyList, KeyValuePair, KeyValuePairList, OnStorageKeyChanged, MockStorageProvider};
