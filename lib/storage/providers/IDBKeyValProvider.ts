@@ -71,3 +71,5 @@ const provider: StorageProvider = {
 };
 
 export default provider;
+
+export {idbKeyValStore};

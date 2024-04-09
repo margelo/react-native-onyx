@@ -1,15 +1,17 @@
 import _ from 'underscore';
+import type {UseStore} from 'idb-keyval';
 import idbKeyVal from 'idb-keyval';
 import type {StorageProvider, MockStorageProvider} from '../types';
 
-const IDBKeyValProvider: StorageProvider = jest.requireActual('../IDBKeyValProvider').default;
+const IDBKeyValProvider = jest.requireActual('../IDBKeyValProvider');
+const idbKeyValStore: UseStore = IDBKeyValProvider.idbKeyValStore;
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const {name: _name, ...IDBKeyValProviderFunctions} = IDBKeyValProvider;
+const {name: _name, ...IDBKeyValProviderFunctions} = IDBKeyValProvider.default as StorageProvider;
 const IDBKeyValProviderMockBase = _.reduce<typeof IDBKeyValProviderFunctions, Partial<MockStorageProvider>>(
     IDBKeyValProviderFunctions,
     (mockAcc, fn, fnName) => ({
         ...mockAcc,
-        // @ts-expect-error - TS doesn't like the dynamic nature of this
         [fnName]: jest.fn(fn),
     }),
     {name: IDBKeyValProvider.name},
@@ -18,6 +20,7 @@ const IDBKeyValProviderMockBase = _.reduce<typeof IDBKeyValProviderFunctions, Pa
 const IDBKeyValProviderMock = {
     ...IDBKeyValProviderMockBase,
     idbKeyval: idbKeyVal,
+    idbKeyValStore,
 };
 
 export default IDBKeyValProviderMock;
