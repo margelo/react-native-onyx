@@ -121,10 +121,10 @@ type OnyxKey = Key | CollectionKey;
  * The type `TKey` extends `OnyxKey` and it is the key used to access a value in `KeyValueMapping`.
  * `TReturnType` is the type of the returned value from the selector function.
  */
-type Selector<TKey extends OnyxKey, TOnyxProps, TReturnType> = (value: OnyxEntry<KeyValueMapping[TKey]>, state?: WithOnyxState<TOnyxProps>) => TReturnType;
+type Selector<TKey extends OnyxKey, TOnyxProps, TReturnType> = (value: OnyxEntryValue<KeyValueMapping[TKey]>, state?: WithOnyxState<TOnyxProps>) => TReturnType;
 
 /**
- * Represents a single Onyx entry, that can be either `TOnyxValue` or `undefined` if it doesn't exist.
+ * Represents a single Onyx entry value, that can be either `TOnyxValue` or `undefined` if it doesn't exist.
  *
  * It can be used to specify data retrieved from Onyx e.g. `withOnyx` HOC mappings.
  *
@@ -151,7 +151,12 @@ type Selector<TKey extends OnyxKey, TOnyxProps, TReturnType> = (value: OnyxEntry
  * })(Component);
  * ```
  */
-type OnyxEntry<TOnyxValue> = TOnyxValue | undefined;
+type OnyxEntryValue<TOnyxValue> = TOnyxValue | undefined;
+
+/**
+ * Represents a Onyx entry that can be either a single entry or a collection of entries, depending on the `TKey` provided.
+ */
+type OnyxEntry<TKey extends OnyxKey> = string extends TKey ? unknown : TKey extends CollectionKeyBase ? OnyxCollection<KeyValueMapping[TKey]> : OnyxEntryValue<KeyValueMapping[TKey]>;
 
 /**
  * Represents an Onyx collection of entries, that can be either a record of `TOnyxValue`s or `undefined` if it is empty or doesn't exist.
@@ -181,7 +186,7 @@ type OnyxEntry<TOnyxValue> = TOnyxValue | undefined;
  * })(Component);
  * ```
  */
-type OnyxCollection<TOnyxValue> = OnyxEntry<Record<string, TOnyxValue | undefined>>;
+type OnyxCollection<TOnyxValue> = OnyxEntryValue<Record<string, TOnyxValue | undefined>>;
 
 /**
  * Represents a mapping of Onyx keys to values, where keys are either normal or collection Onyx keys
@@ -195,11 +200,6 @@ type OnyxCollection<TOnyxValue> = OnyxEntry<Record<string, TOnyxValue | undefine
 type KeyValueMapping = {
     [TKey in keyof TypeOptions['values'] as TKey extends CollectionKeyBase ? `${TKey}${string}` : TKey]: TypeOptions['values'][TKey];
 };
-
-/**
- * Represents a Onyx value that can be either a single entry or a collection of entries, depending on the `TKey` provided.
- */
-type OnyxValue<TKey extends OnyxKey> = string extends TKey ? unknown : TKey extends CollectionKeyBase ? OnyxCollection<KeyValueMapping[TKey]> : OnyxEntry<KeyValueMapping[TKey]>;
 
 /** Utility type to extract `TOnyxValue` from `OnyxCollection<TOnyxValue>` */
 type ExtractOnyxCollectionValue<TOnyxCollection> = TOnyxCollection extends NonNullable<OnyxCollection<infer U>> ? U : never;
@@ -275,7 +275,7 @@ type WithOnyxConnectOptions<TKey extends OnyxKey> = {
     canEvict?: boolean;
 };
 
-type DefaultConnectCallback<TKey extends OnyxKey> = (value: OnyxEntry<KeyValueMapping[TKey]>, key: TKey) => void;
+type DefaultConnectCallback<TKey extends OnyxKey> = (value: OnyxEntryValue<KeyValueMapping[TKey]>, key: TKey) => void;
 
 type CollectionConnectCallback<TKey extends OnyxKey> = (value: NonUndefined<OnyxCollection<KeyValueMapping[TKey]>>) => void;
 
@@ -391,6 +391,8 @@ type OnyxUpdate =
           };
       }[CollectionKeyBase];
 
+type OnyxValue<TOnyxValue> = OnyxEntryValue<TOnyxValue> | OnyxInputValue<TOnyxValue>;
+
 /**
  * Represents the options used in `Onyx.init()` method.
  */
@@ -441,7 +443,6 @@ export type {
     DefaultConnectOptions,
     ExtractOnyxCollectionValue,
     GenericFunction,
-    InitOptions,
     Key,
     KeyValueMapping,
     Mapping,
@@ -450,6 +451,7 @@ export type {
     OnyxInputKeyValueMapping,
     NullishDeep,
     OnyxCollection,
+    OnyxEntryValue,
     OnyxEntry,
     OnyxKey,
     OnyxInputValue,
@@ -460,6 +462,7 @@ export type {
     OnyxMergeCollectionInput,
     OnyxUpdate,
     OnyxValue,
+    InitOptions,
     Selector,
     WithOnyxConnectOptions,
 };
