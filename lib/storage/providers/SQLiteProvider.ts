@@ -45,18 +45,6 @@ function objectMarkRemover(key: string, value: unknown) {
     return value;
 }
 
-/**
- * Transforms the replace null patches into SQL queries to be passed to JSON_REPLACE.
- */
-function generateJSONReplaceSQLQueries(key: string, patches: FastMergeReplaceNullPatch[]): string[][] {
-    const queries = patches.map(([pathArray, value]) => {
-        const jsonPath = `$.${pathArray.join('.')}`;
-        return [jsonPath, JSON.stringify(value), key];
-    });
-
-    return queries;
-}
-
 const provider: StorageProvider<NitroSQLiteConnection | undefined> = {
     store: undefined,
 
