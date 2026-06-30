@@ -126,11 +126,14 @@ const provider: StorageProvider<NitroSQLiteConnection | undefined> = {
         }
 
         const query = 'REPLACE INTO keyvaluepairs (record_key, valueJSON) VALUES (?, ?);';
-        const params = pairs.map((pair) => [pair[0], JSON.stringify(pair[1] === undefined ? null : pair[1])]);
-        if (utils.isEmptyObject(params)) {
+        const commands: BatchQueryCommand[] = pairs.map(([key, value]) => ({
+            query,
+            params: [key, JSON.stringify(value === undefined ? null : value)],
+        }));
+        if (utils.isEmptyObject(commands)) {
             return Promise.resolve();
         }
-        return provider.store.executeBatchAsync([{query, params}]).then(() => undefined);
+        return provider.store.executeBatchAsync(commands).then(() => undefined);
     },
     multiMerge(pairs) {
         if (!provider.store) {
