@@ -7,7 +7,7 @@
  *   - open({name})
  *   - connection.execute(sql)
  *   - connection.executeAsync<T>(sql, params?)
- *   - connection.executeBatchAsync([{query, params}])
+ *   - connection.executeBatchAsync([{query, params}, ...])
  *
  * Result rows are shaped to match Nitro: `{rows: {_array, item, length}}`.
  */
@@ -124,24 +124,24 @@ function makeConnection(name: string): Pick<NitroSQLiteConnection, 'execute' | '
                     for (const command of commands) {
                         const namedOrder = extractNamedParameterOrder(command.query);
                         const statement = connection.prepare(command.query);
-                        const parameterRows = (command.params ?? []) as SQLiteQueryParams[];
-                        if (parameterRows.length === 0) {
+                        const params = command.params as SQLiteQueryParams | undefined;
+
+                        if (!params || params.length === 0) {
                             const info = statement.run();
                             total += info.changes;
                             continue;
                         }
-                        for (const row of parameterRows) {
-                            if (namedOrder) {
-                                const bindings: Record<string, unknown> = {};
-                                for (let index = 0; index < namedOrder.length; index++) {
-                                    bindings[namedOrder[index]] = row[index];
-                                }
-                                const info = statement.run(bindings);
-                                total += info.changes;
-                            } else {
-                                const info = statement.run(...row);
-                                total += info.changes;
+
+                        if (namedOrder) {
+                            const bindings: Record<string, unknown> = {};
+                            for (let index = 0; index < namedOrder.length; index++) {
+                                bindings[namedOrder[index]] = params[index];
                             }
+                            const info = statement.run(bindings);
+                            total += info.changes;
+                        } else {
+                            const info = statement.run(...params);
+                            total += info.changes;
                         }
                     }
                 })();
