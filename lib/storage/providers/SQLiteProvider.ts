@@ -145,7 +145,7 @@ const provider: StorageProvider<NitroSQLiteConnection | undefined> = {
             ON CONFLICT DO UPDATE
             SET valueJSON = JSON_PATCH(valueJSON, :value);
         `;
-        const patchQueryArguments: string[][] = [];
+        const patchQueryParams: string[][] = [];
 
         // Query to fully replace the nested objects of the DB value.
         // NOTE: The JSON() wrapper around the replacement value is required here. Unlike JSON_PATCH (which
@@ -156,27 +156,33 @@ const provider: StorageProvider<NitroSQLiteConnection | undefined> = {
             SET valueJSON = JSON_REPLACE(valueJSON, ?, JSON(?))
             WHERE record_key = ?;
         `;
-        const replaceQueryArguments: string[][] = [];
+        const replaceQueryParams: string[][] = [];
 
         const nonNullishPairs = pairs.filter((pair) => pair[1] !== undefined);
 
         for (const [key, value, replaceNullPatches] of nonNullishPairs) {
             const changeWithoutMarkers = JSON.stringify(value, objectMarkRemover);
-            patchQueryArguments.push([key, changeWithoutMarkers]);
+            patchQueryParams.push([key, changeWithoutMarkers]);
 
             const patches = replaceNullPatches ?? [];
             if (patches.length > 0) {
-                const queries = generateJSONReplaceSQLQueries(key, patches);
+                const replaceParams = patches.map(([pathArray, patchValue]) => {
+                    const jsonPath = `$.${pathArray.join('.')}`;
+                    return [jsonPath, JSON.stringify(patchValue), key];
+                });
 
-                if (queries.length > 0) {
-                    replaceQueryArguments.push(...queries);
+                if (replaceParams.length > 0) {
+                    replaceQueryParams.push(...replaceParams);
                 }
             }
         }
 
-        commands.push({query: patchQuery, params: patchQueryArguments});
-        if (replaceQueryArguments.length > 0) {
-            commands.push({query: replaceQuery, params: replaceQueryArguments});
+        for (const params of patchQueryParams) {
+            commands.push({query: patchQuery, params});
+        }
+
+        for (const params of replaceQueryParams) {
+            commands.push({query: replaceQuery, params});
         }
 
         return provider.store.executeBatchAsync(commands).then(() => undefined);
